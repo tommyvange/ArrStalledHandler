@@ -10,14 +10,14 @@ import logging
 load_dotenv()
 
 # Configuration from .env
-RADARR_URL = os.getenv("RADARR_URL")
-RADARR_API_KEY = os.getenv("RADARR_API_KEY")
-SONARR_URL = os.getenv("SONARR_URL")
-SONARR_API_KEY = os.getenv("SONARR_API_KEY")
-LIDARR_URL = os.getenv("LIDARR_URL")
-LIDARR_API_KEY = os.getenv("LIDARR_API_KEY")
-READARR_URL = os.getenv("READARR_URL")
-READARR_API_KEY = os.getenv("READARR_API_KEY")
+RADARR_URL = os.getenv("RADARR_URL").split(",")
+RADARR_API_KEY = os.getenv("RADARR_API_KEY").split(",")
+SONARR_URL = os.getenv("SONARR_URL").split(",")
+SONARR_API_KEY = os.getenv("SONARR_API_KEY").split(",")
+LIDARR_URL = os.getenv("LIDARR_URL").split(",")
+LIDARR_API_KEY = os.getenv("LIDARR_API_KEY").split(",")
+READARR_URL = os.getenv("READARR_URL").split(",")
+READARR_API_KEY = os.getenv("READARR_API_KEY").split(",")
 STALLED_TIMEOUT = int(os.getenv("STALLED_TIMEOUT", 3600))
 STALLED_ACTION = os.getenv("STALLED_ACTION", "BLOCKLIST_AND_SEARCH").upper()
 VERBOSE = os.getenv("VERBOSE", "false").lower() == "true"
@@ -311,17 +311,22 @@ if __name__ == "__main__":
         while True:
             initialize_database()
 
-            # Handle regular stalled downloads
-            handle_stalled_downloads(RADARR_URL, RADARR_API_KEY, "Radarr", "v3")
-            handle_stalled_downloads(SONARR_URL, SONARR_API_KEY, "Sonarr", "v3")
-            handle_stalled_downloads(LIDARR_URL, LIDARR_API_KEY, "lidarr", "v1")
-            handle_stalled_downloads(READARR_URL, READARR_API_KEY, "readarr", "v1")
+            #itterate through env variables for services
+            for radarrCount in range(len(RADARR_URL)):
+                handle_stalled_downloads(RADARR_URL[radarrCount], RADARR_API_KEY[radarrCount], "Radarr"+str(radarrCount), "v3")  # Handle regular stalled downloads
+                detect_stuck_metadata_downloads(RADARR_URL[radarrCount], RADARR_API_KEY[radarrCount], "Radarr"+str(radarrCount), "v3")  # Detect stuck downloads at "Downloading Metadata"
 
-            # Detect stuck downloads at "Downloading Metadata"
-            detect_stuck_metadata_downloads(RADARR_URL, RADARR_API_KEY, "Radarr", "v3")
-            detect_stuck_metadata_downloads(SONARR_URL, SONARR_API_KEY, "Sonarr", "v3")
-            detect_stuck_metadata_downloads(LIDARR_URL, LIDARR_API_KEY, "Lidarr", "v1")
-            detect_stuck_metadata_downloads(READARR_URL, READARR_API_KEY, "Readarr", "v1")
+            for sonarrCount in range(len(SONARR_URL)):
+                handle_stalled_downloads(SONARR_URL[sonarrCount], SONARR_API_KEY[sonarrCount], "Sonarr"+str(sonarrCount), "v3")  # Handle regular stalled downloads
+                detect_stuck_metadata_downloads(SONARR_URL[sonarrCount], SONARR_API_KEY[sonarrCount], "Sonarr"+str(sonarrCount), "v3")  # Detect stuck downloads at "Downloading Metadata"
+            
+            for lidarrCount in range(len(LIDARR_URL)):
+                handle_stalled_downloads(LIDARR_URL[lidarrCount], LIDARR_API_KEY[lidarrCount], "lidarr"+str(lidarrCount), "v1")  # Handle regular stalled downloads
+                detect_stuck_metadata_downloads(LIDARR_URL[lidarrCount], LIDARR_API_KEY[lidarrCount], "Lidarr"+str(lidarrCount), "v1")  # Detect stuck downloads at "Downloading Metadata"
+
+            for readarrCount in range(len(READARR_URL)):
+                handle_stalled_downloads(READARR_URL[readarrCount], READARR_API_KEY[readarrCount], "readarr"+str(readarrCount), "v1")  # Handle regular stalled downloads
+                detect_stuck_metadata_downloads(READARR_URL[readarrCount], READARR_API_KEY[readarrCount], "Readarr"+str(readarrCount), "v1")  # Detect stuck downloads at "Downloading Metadata"
 
             logging.info(f"Script execution completed. Sleeping for {RUN_INTERVAL} seconds...")
             time.sleep(RUN_INTERVAL)

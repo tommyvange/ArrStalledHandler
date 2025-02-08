@@ -40,13 +40,13 @@ The script is fully configurable using environment variables specified in a `.en
 
 | Variable                                | Description                                                                                     | Default Value          |
 |-----------------------------------------|-------------------------------------------------------------------------------------------------|------------------------|
-| `RADARR_URL`                            | The base URL for Radarr's API. Example: `http://localhost:7878`.                                | None (required)        |
+| `RADARR_URL`                            | The base URL for Radarr's API. Example: `http://localhost:7878,http://otherhost:7878`.          | None (required)        |
 | `RADARR_API_KEY`                        | The API key for Radarr (found in Radarr settings).                                              | None (required)        |
-| `SONARR_URL`                            | The base URL for Sonarr's API. Example: `http://localhost:8989`.                                | None (required)        |
+| `SONARR_URL`                            | The base URL for Sonarr's API. Example: `http://localhost:8989,http://otherhost:8989`.          | None (required)        |
 | `SONARR_API_KEY`                        | The API key for Sonarr (found in Sonarr settings).                                              | None (required)        |
-| `LIDARR_URL`                            | The base URL for Lidarr's API. Example: `http://localhost:8686`.                                | None (required)        |
+| `LIDARR_URL`                            | The base URL for Lidarr's API. Example: `http://localhost:8686,http://otherhost:8686`.          | None (required)        |
 | `LIDARR_API_KEY`                        | The API key for Lidarr (found in Radarr settings).                                              | None (required)        |
-| `READARR_URL`                           | The base URL for Readarr's API. Example: `http://localhost:8787`.                               | None (required)        |
+| `READARR_URL`                           | The base URL for Readarr's API. Example: `http://localhost:8787,http://otherhost:8787`.         | None (required)        |
 | `READARR_API_KEY`                       | The API key for Readarr (found in Sonarr settings).                                             | None (required)        |
 | `STALLED_TIMEOUT`                       | Time (in seconds) a download must remain stalled before actions are taken.                      | `3600` (1 hour)        |
 | `STALLED_ACTION`                        | Action to perform on stalled downloads: `REMOVE`, `BLOCKLIST`, or `BLOCKLIST_AND_SEARCH`.       | `BLOCKLIST_AND_SEARCH` |
@@ -54,7 +54,7 @@ The script is fully configurable using environment variables specified in a `.en
 | `RUN_INTERVAL`                          | Time (in seconds) between script executions when running in Docker.                             | `300` (5 minutes)      |
 | `COUNT_DOWNLOADING_METADATA_AS_STALLED` | Weather the script should count downloads with the status of "Downloading Metadata" as stalled. | `false`                |
 
-To disable Radarr or Sonarr; leave the URL empty in the environment. If the service does not have a URL, then it is skipped.
+To disable Radarr or Sonarr; leave the URL empty in the environment. If the service does not have a URL, then it is skipped. Multple services are allowed by using comma seperated values.
 
 ----------
 
@@ -112,14 +112,14 @@ services:
     container_name: ArrStalledHandler
     restart: unless-stopped
     environment:
-      RADARR_URL: "http://localhost:7878"
-      RADARR_API_KEY: "your_radarr_api_key"
-      SONARR_URL: "http://localhost:8989"
-      SONARR_API_KEY: "your_radarr_api_key"
-      LIDARR_URL: "http://localhost:8686"
-      LIDARR_API_KEY: "your_lidarr_api_key"
-      READARR_URL: "http://localhost:8787"
-      READARR_API_KEY: "your_readarr_api_key"
+      RADARR_URL: "http://localhost:7878,http://otherhost:7878"
+      RADARR_API_KEY: "your_radarr_api_key,your_2nd_radarr_api_key"
+      SONARR_URL: "http://localhost:8989,http://otherhost:8989"
+      SONARR_API_KEY: "your_sonarr_api_key,your_2nd_sonarr_api_key"
+      LIDARR_URL: "http://localhost:8686,http://otherhost:8686"
+      LIDARR_API_KEY: "your_lidarr_api_key,your_2nd_lidarr_api_key"
+      READARR_URL: "http://localhost:8787,http://otherhost:8787"
+      READARR_API_KEY: "your_readarr_api_key,our_2nd_readarr_api_key"
       STALLED_TIMEOUT: "3600"
       STALLED_ACTION: "BLOCKLIST_AND_SEARCH"
       VERBOSE: "false"
@@ -135,14 +135,14 @@ More info at [Docker Docs](https://docs.docker.com/engine/containers/run/).
 ``` bash
 docker run -d \
   --name=ArrStalledHandler \
-  -e RADARR_URL=http://localhost:7878 \
-  -e RADARR_API_KEY=your_radarr_api_key \
-  -e SONARR_URL=http://localhost:8989 \
-  -e SONARR_API_KEY=your_radarr_api_key \
-  -e LIDARR_URL=http://localhost:8686 \
-  -e LIDARR_API_KEY=your_lidarr_api_key \
-  -e READARR_URL=http://localhost:8787 \
-  -e READARR_API_KEY=your_readarr_api_key \
+  -e RADARR_URL=http://localhost:7878,http://otherhost:7878 \
+  -e RADARR_API_KEY=your_radarr_api_key,your_2nd_radarr_api_key \
+  -e SONARR_URL=http://localhost:8989,http://otherhost:8989 \
+  -e SONARR_API_KEY=your_sonarr_api_key,your_2nd_sonarr_api_key \
+  -e LIDARR_URL=http://localhost:8686,http://otherhost:8686 \
+  -e LIDARR_API_KEY=your_lidarr_api_key,your_2nd_lidarr_api_key \
+  -e READARR_URL=http://localhost:8787,http://otherhost:8787 \
+  -e READARR_API_KEY=your_readarr_api_key,our_2nd_readarr_api_key \
   -e STALLED_TIMEOUT=3600 \
   -e STALLED_ACTION=BLOCKLIST_AND_SEARCH \
   -e VERBOSE=false \
@@ -154,7 +154,7 @@ docker run -d \
 
 *One line:*
 ``` bash
-docker run -d --name=ArrStalledHandler -e RADARR_URL=http://localhost:7878 -e RADARR_API_KEY=your_radarr_api_key -e SONARR_URL=http://localhost:8989 -e SONARR_API_KEY=your_radarr_api_key -e LIDARR_URL=http://localhost:8686 -e LIDARR_API_KEY=your_lidarr_api_key -e READARR_URL=http://localhost:8787 -e READARR_API_KEY=your_readarr_api_key -e STALLED_TIMEOUT=3600 -e STALLED_ACTION=BLOCKLIST_AND_SEARCH -e VERBOSE=false -e RUN_INTERVAL=300 -e COUNT_DOWNLOADING_METADATA_AS_STALLED=false --restart unless-stopped tommythebeast/arrstalledhandler:latest
+docker run -d --name=ArrStalledHandler -e RADARR_URL=http://localhost:7878,http://otherhost:7878 -e RADARR_API_KEY=your_radarr_api_key,your_2nd_radarr_api_key -e SONARR_URL=http://localhost:8989,http://otherhost:8989 -e SONARR_API_KEY=your_sonarr_api_key,your_2nd_sonarr_api_key -e LIDARR_URL=http://localhost:8686,http://otherhost:8686  -e LIDARR_API_KEY=your_lidarr_api_key,your_2nd_lidarr_api_key -e READARR_URL=http://localhost:8787,http://otherhost:8787 -e READARR_API_KEY=your_readarr_api_key,our_2nd_readarr_api_key -e STALLED_TIMEOUT=3600 -e STALLED_ACTION=BLOCKLIST_AND_SEARCH -e VERBOSE=false -e RUN_INTERVAL=300 -e COUNT_DOWNLOADING_METADATA_AS_STALLED=false --restart unless-stopped tommythebeast/arrstalledhandler:latest
 ```
 
 ### Docker Deployment (Manual)
@@ -171,14 +171,14 @@ docker run -d --name=ArrStalledHandler -e RADARR_URL=http://localhost:7878 -e RA
     Create a `.env` file and populate it with the required variables:
  
     ``` env
-    RADARR_URL=http://localhost:7878
-    RADARR_API_KEY=your_radarr_api_key
-    SONARR_URL=http://localhost:8989
-    SONARR_API_KEY=your_sonarr_api_key
-    LIDARR_URL=http://localhost:8686
-    LIDARR_API_KEY=your_lidarr_api_key
-    READARR_URL=http://localhost:8787
-    READARR_API_KEY=your_readarr_api_key
+    RADARR_URL=http://localhost:7878,http://otherhost:7878
+    RADARR_API_KEY=aaaabbbbcccc111122223333,xxxxyyyyzzzz777788889999
+    SONARR_URL=http://localhost:8989,http://otherhost:8989
+    SONARR_API_KEY=aaaabbbbcccc111122223333,xxxxyyyyzzzz777788889999
+    LIDARR_URL=http://localhost:8686,http://otherhost:8686
+    LIDARR_API_KEY=aaaabbbbcccc111122223333,xxxxyyyyzzzz777788889999
+    READARR_URL=http://localhost:8787,http://otherhost:8787
+    READARR_API_KEY=aaaabbbbcccc111122223333,xxxxyyyyzzzz777788889999
     STALLED_TIMEOUT=3600
     STALLED_ACTION=BLOCKLIST_AND_SEARCH
     VERBOSE=false
@@ -219,14 +219,14 @@ docker run -d --name=ArrStalledHandler -e RADARR_URL=http://localhost:7878 -e RA
     Create a `.env` file and populate it with the required variables:
  
     ``` env
-    RADARR_URL=http://localhost:7878
-    RADARR_API_KEY=your_radarr_api_key
-    SONARR_URL=http://localhost:8989
-    SONARR_API_KEY=your_sonarr_api_key
-    LIDARR_URL=http://localhost:8686
-    LIDARR_API_KEY=your_lidarr_api_key
-    READARR_URL=http://localhost:8787
-    READARR_API_KEY=your_readarr_api_key
+    RADARR_URL=http://localhost:7878,http://otherhost:7878
+    RADARR_API_KEY=aaaabbbbcccc111122223333,xxxxyyyyzzzz777788889999
+    SONARR_URL=http://localhost:8989,http://otherhost:8989
+    SONARR_API_KEY=aaaabbbbcccc111122223333,xxxxyyyyzzzz777788889999
+    LIDARR_URL=http://localhost:8686,http://otherhost:8686
+    LIDARR_API_KEY=aaaabbbbcccc111122223333,xxxxyyyyzzzz777788889999
+    READARR_URL=http://localhost:8787,http://otherhost:8787
+    READARR_API_KEY=aaaabbbbcccc111122223333,xxxxyyyyzzzz777788889999
     STALLED_TIMEOUT=3600
     STALLED_ACTION=BLOCKLIST_AND_SEARCH
     VERBOSE=false
